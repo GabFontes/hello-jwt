@@ -20,21 +20,25 @@ const validateBody = (body) =>
   }).validate(body);
 
 module.exports = async (req, res, next) => {
+  const { password, username } = req.body;
   /* Construímos um schema do Joi */
   const { error } = validateBody(req.body);
 
   /* Caso ocorra erro na validação do Joi, passamos esse */
   /* erro para o express, que chamará nosso middleware de erro */
   if (error) return next(error);
-
   const payload = {
-    username: req.body.username,
+    username,
     admin: false,
   };
+
+  if (username === 'admin' && password === 's3nh4S3gur4???') {
+    payload.admin = true;
+  }
 
   const token = jwt.sign(payload, JWT_SECRET, {
     expiresIn: '1h',
   });
 
-  res.status(200).json({ token });
+  res.status(200).json({ token, payload });
 };
